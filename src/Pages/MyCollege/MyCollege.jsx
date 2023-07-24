@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../Providers/AuthProvider';
 import Rating from 'react-rating';
 import { FaRegStar, FaStar } from 'react-icons/fa';
+import Swal from 'sweetalert2';
 
 const MyCollege = () => {
     const { user } = useContext(AuthContext);
@@ -17,16 +18,44 @@ const MyCollege = () => {
     const submit = (event) => {
         event.preventDefault();
         const form = event.target;
-        const collegeName=details?.collegeName;
-        const photo=details?.photo;
-        const image=details?.image;
-
+        const name=details?.name;
+        const collegeName = details?.collegeName;
+        const photo = details?.photo;
+        const image = details?.image;
         const review = form.review.value;
 
-        console.log(review, rating , collegeName ,photo,image);
+        const reviews = { review, rating, name, collegeName, photo, image }; 
 
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, Add it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`http://localhost:5000/reviews`, {
+                    method: 'POST',
+                    headers: {
+                        'content-type': 'application/json'
+                    },
+                    body: JSON.stringify(reviews)
+                })
+                    .then(res => res.json()) // Fixed the error in the fetch call
+                    .then(data => {
+                        console.log(data)
+                        Swal.fire(
+                            'ADD!',
+                            'Your Toy has been added.',
+                            'success'
+                        )
+                    })
+                form.reset();
+            }
+        })
     }
-
     return (
         <section>
             <div className='w-1/2 md:flex mx-auto py-5'>
@@ -45,7 +74,7 @@ const MyCollege = () => {
                             initialRating={rating} // Set the initial rating value
                             onChange={(value) => setRating(value)} // Update the rating value on change
                         />
-                        <input type="submit"  className='btn bg-blue-400' />
+                        <input type="submit" className='btn bg-blue-400' />
                     </form>
                 </div>
             </div>
