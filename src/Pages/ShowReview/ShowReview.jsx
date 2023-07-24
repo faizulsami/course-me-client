@@ -6,7 +6,7 @@ const ShowReview = () => {
     const [review, setReview] = useState([]);
 
     useEffect(() => {
-        fetch('http://localhost:5000/showAllReviews')
+        fetch('https://course-me.vercel.app/showAllReviews')
             .then(res => res.json())
             .then(data => setReview(data));
     }, []);
